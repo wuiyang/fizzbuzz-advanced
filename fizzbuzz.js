@@ -15,14 +15,14 @@ const ConditionProcessMethod = {
   RULES: (output, key, value) => output[key].push(ruleToCondition(value)),
   INCREMENT: (output, key, value) => output[key] = +value[0],
   START: (output, key, value) => output[key] = +value[0],
-  END: (output, key, value) => output[key] = ruleToEndCondition(value),
+  END: (output, key, value) => output[key] = +value[0],
 };
 const ConditionOutputSequence = [Keywords.RULES, Keywords.INCREMENT, Keywords.START, Keywords.END];
 const DefaultGenerators = {
   RULES: () => [],
   INCREMENT: () => 1,
   START: () => 1,
-  END: () => i => i >= 100
+  END: () => 100
 };
 
 // helpers
@@ -36,7 +36,6 @@ const getRules = args => args.split(Delimiters.LINE).map(argLineToInput).filter(
 // for fizzbuzz
 const divisibleByN = (number, n) => number % n === 0;
 const ruleToCondition = rule => number => divisibleByN(number, +rule[0]) ? rule[1] : Keywords.EMPTY;
-const ruleToEndCondition = rule => number => number >= +rule[0];
 const toOutputValue = (output, i) => output || `${i}`;
 
 // args to fizzbuzz
@@ -54,14 +53,20 @@ const getFizzBuzzArguments = rules => rules.reduce((outputObj, rule) => {
   return obj;
 }, {}));
 
+const getFizzBuzzRange = (min, max, step) => {
+  const length = (max - min) / step + 1;
+  return Array.from({ length }, (_, i) => i * step + min);
+};
+
 // main function
 const fizzBuzz = (args, print) => {
   const rules = getRules(args);
   const fbArgs = getFizzBuzzArguments(rules);
-  for (let i = fbArgs.START; !fbArgs.END(i); i += fbArgs.INCREMENT) {
+
+  getFizzBuzzRange(fbArgs.START, fbArgs.END, fbArgs.INCREMENT).forEach(i => {
     const output = fbArgs.RULES.reduce((text, condition) => text + condition(i), '');
     print(toOutputValue(output, i));
-  }
+  });
 };
 
 // testing
@@ -73,16 +78,3 @@ const testFizzBuzzArgs = `
 100 ${Keywords.END}
 `;
 fizzBuzz(testFizzBuzzArgs, console.log);
-
-// random orders are allowed
-// printing sequence are according to number
-fizzBuzz(`
-15300 ${Constants.Keywords.END}
-5 Buzz
-7 Fuzz
-3 Fizz
-3 ${Constants.Keywords.INCREMENT}
-13 Biff
-11 Bizz
-15001 ${Constants.Keywords.START}
-`, console.log);
