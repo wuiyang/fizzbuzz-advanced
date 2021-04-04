@@ -54,13 +54,13 @@ const getFizzBuzzArguments = rules => rules.reduce((outputObj, rule) => {
 }, {}));
 
 const getFizzBuzzRange = (min, max, step) => {
-  const diff = max - min
-  const diffIsNegative = diff < 0
-  const stepIsNegative = step < 0
+  const diff = max - min;
+  const diffIsNegative = diff < 0;
+  const stepIsNegative = step < 0;
   
   // XOR, if either is different
   if (diffIsNegative !== stepIsNegative) {
-    throw new Error('Invalid range given!')
+    throw new Error('Invalid range given!');
   }
 
   const length = diff / step + 1;
